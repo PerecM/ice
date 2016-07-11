@@ -20,7 +20,7 @@ import org.junit.Test;
 import java.util.List;
 
 /**
- * @author Hector Plahar
+ * @author Hector Plahar, Elena Aravina
  */
 public class SampleServiceTest {
 
@@ -31,6 +31,11 @@ public class SampleServiceTest {
         HibernateUtil.initializeMock();
         HibernateUtil.beginTransaction();
         service = new SampleService();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        HibernateUtil.commitTransaction();
     }
 
     @Test
@@ -281,8 +286,8 @@ public class SampleServiceTest {
         Assert.assertEquals(1, partSamples.size());
     }
 
-    @After
-    public void tearDown() throws Exception {
-        HibernateUtil.commitTransaction();
+    @Test
+    public void testGetSamplesOnPlateByTubeBarcode() {
+
     }
 }

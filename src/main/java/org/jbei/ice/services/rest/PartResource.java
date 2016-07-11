@@ -17,6 +17,8 @@ import org.jbei.ice.lib.dto.comment.UserComment;
 import org.jbei.ice.lib.dto.common.Results;
 import org.jbei.ice.lib.dto.entry.*;
 import org.jbei.ice.lib.dto.sample.PartSample;
+import org.jbei.ice.lib.dto.sample.SamplePlate;
+import org.jbei.ice.lib.dto.sample.SampleType;
 import org.jbei.ice.lib.dto.web.RegistryPartner;
 import org.jbei.ice.lib.entry.*;
 import org.jbei.ice.lib.entry.attachment.AttachmentController;
@@ -32,8 +34,10 @@ import org.jbei.ice.lib.utils.Utils;
 import org.jbei.ice.storage.DAOFactory;
 import org.jbei.ice.storage.hibernate.dao.EntryDAO;
 import org.jbei.ice.storage.hibernate.dao.ShotgunSequenceDAO;
+import org.jbei.ice.storage.hibernate.dao.StorageDAO;
 import org.jbei.ice.storage.model.Entry;
 import org.jbei.ice.storage.model.ShotgunSequence;
+import org.jbei.ice.storage.model.Storage;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -62,6 +66,7 @@ public class PartResource extends RestResource {
     private SequenceController sequenceController = new SequenceController();
     private SampleService sampleService = new SampleService();
     private RemoteEntries remoteEntries = new RemoteEntries();
+    private StorageDAO storageDAO = new StorageDAO();
 
     /**
      * Retrieves a part using any of the unique identifiers. e.g. Part number, synthetic id, or
@@ -482,12 +487,27 @@ public class PartResource extends RestResource {
         return super.respond(Response.Status.OK);
     }
 
+    /**
+     * @return Response with matching part samples (each sample is on the plate with other parts' samples)
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}/samples")
-    public ArrayList<PartSample> getSamples(@PathParam("id") long partId) {
+    public Response getSamples(@PathParam("id") long partId,
+                               @DefaultValue("false") @QueryParam("fetch_all") boolean fetchAll) {
         String userId = requireUserId();
-        return sampleService.retrieveEntrySamples(userId, partId);
+        ArrayList<PartSample> partSamples = sampleService.retrieveEntrySamples(userId, partId);
+
+        if (fetchAll) {
+            ArrayList<SamplePlate> allSamples = new ArrayList<>();
+            for (int i = 0; i < partSamples.size(); i++) {
+                String tubeBarcode = partSamples.get(i).getLocation().getChild().getChild().getDisplay();// TODO: 7/22/16
+                SamplePlate samplePlate = sampleService.getSamplesOnPlateByTubeBarcode(userId, tubeBarcode);
+                allSamples.add(samplePlate);
+            }
+            return super.respond(allSamples);
+        }
+        return super.respond(partSamples);
     }
 
     @POST

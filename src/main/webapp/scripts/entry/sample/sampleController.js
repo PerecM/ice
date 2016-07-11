@@ -202,5 +202,3 @@ angular.module('ice.entry.sample.controller', [])
             return false;
         }
     });
-
-

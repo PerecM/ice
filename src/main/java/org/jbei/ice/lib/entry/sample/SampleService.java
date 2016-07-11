@@ -5,6 +5,7 @@ import org.jbei.ice.lib.common.logging.Logger;
 import org.jbei.ice.lib.dto.StorageLocation;
 import org.jbei.ice.lib.dto.comment.UserComment;
 import org.jbei.ice.lib.dto.sample.PartSample;
+import org.jbei.ice.lib.dto.sample.SamplePlate;
 import org.jbei.ice.lib.dto.sample.SampleType;
 import org.jbei.ice.lib.entry.EntryAuthorization;
 import org.jbei.ice.lib.utils.Utils;
@@ -21,7 +22,7 @@ import java.util.Set;
 /**
  * Service for dealing with {@link Sample}s
  *
- * @author Hector Plahar
+ * @author Hector Plahar, Elena Aravina
  */
 public class SampleService {
 
@@ -78,6 +79,7 @@ public class SampleService {
                     break;
 
                 case PLATE96:
+                    // todo: first ask for a plate barcode, if existing, then call it
                     currentStorage = createPlate96Location(depositor, mainLocation);
                     break;
 
@@ -118,6 +120,8 @@ public class SampleService {
      * @return sample storage with a complete hierachy or null
      */
     protected Storage createPlate96Location(String sampleDepositor, StorageLocation mainLocation) {
+        // TODO: 7/8/16 check if new plate is needed or there is an existing one
+
         // validate: expected format is [PLATE96, WELL, (optional - TUBE)]
         StorageLocation well = mainLocation.getChild();
         StorageLocation tube;
@@ -370,5 +374,49 @@ public class SampleService {
             partSamples.add(sample.toDataTransferObject());
         }
         return partSamples;
+    }
+
+    /**
+     * Retrieves all samples that are stored
+     * on a particular 96 well plate containing one specific tube with a known barcode.
+     *
+     * @param userId
+     * @param tubeBarcode barcode (or index) of one of the plate's TUBE Storage
+     * @return wrapper object with all samples on the specified plate
+     */
+    public SamplePlate getSamplesOnPlateByTubeBarcode(String userId, String tubeBarcode) {
+        Storage tube = storageDAO.retrieveStorageTube(tubeBarcode);
+        if (tube == null) {
+            return null;
+        }
+        Storage parent = tube.getParent();
+        if (parent == null) {
+            return null;
+        }
+        while (parent.getStorageType() != Storage.StorageType.PLATE96) {
+            parent = parent.getParent();
+        }
+
+        String plateBarcode = parent.getIndex(); //get that plate barcode
+
+        List<Sample> samples = dao.getSamplesByPlate(plateBarcode); //all samples on the plate
+
+        SamplePlate samplesByPlate = new SamplePlate(plateBarcode);
+
+        for (Sample sample: samples) {
+            Entry entry = sample.getEntry();
+            if (entry == null)
+                continue;
+            if (!entryAuthorization.canRead(userId, entry))
+                continue;
+
+            Storage sampleWell = sample.getStorage().getParent();
+            try {
+                samplesByPlate.insertSample(sample.toDataTransferObject(), sampleWell);
+            } catch (Exception e) {
+                Logger.error("Well " + sampleWell.getIndex() + " already contains a sample.");
+            }
+        }
+        return samplesByPlate;
     }
 }
