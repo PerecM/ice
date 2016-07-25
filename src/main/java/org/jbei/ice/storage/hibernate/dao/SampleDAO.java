@@ -113,7 +113,7 @@ public class SampleDAO extends HibernateRepository<Sample> {
                     if (tubesInWell == null) {
                         continue; //todo take care of childless well?
                     } else if (tubesInWell.size() > 1) {
-                        Logger.warn("Well " + well.getIndex() + " has more than one tube: " + tubesInWell.size() );
+                        Logger.error("Well " + well.getIndex() + " has more than one tube: " + tubesInWell.size() );
                     }
 
                     // assume only one tube in a well

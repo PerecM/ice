@@ -148,7 +148,7 @@
         </div>
     </div>
 
-    <div class="row pad_top" ng-if="samples.length===0">
+    <div class="row pad_top" ng-if="plates.length===0 || samples.length===0">
         <div class="col-md-12">
             <i class="text-muted">No samples available</i>
         </div>
@@ -162,12 +162,12 @@
 
                 <!--left sample-->
                 <div class="col-md-6" ng-if="samples[$index+0].location.type==='PLATE96'&&samples[$index+0]">
-                    <ice-plate96 sample="samples[$index+0]" on-delete="delete(samples[$index+0])"></ice-plate96>
+                    <ice-plate96 plate="plates[$index+0]" sample="samples[$index+0]" on-delete="delete(samples[$index+0])"></ice-plate96>
                 </div>
 
                 <!--right sample-->
                 <div class="col-md-6" ng-if="samples[$index+1].location.type==='PLATE96'&&samples[$index+1]">
-                    <ice-plate96 sample="samples[$index+1]" on-delete="delete(samples[$index+1])"></ice-plate96>
+                    <ice-plate96 plate="plates[$index+1]" sample="samples[$index+1]" on-delete="delete(samples[$index+1])"></ice-plate96>
                 </div>
 
                 <!--widget for shelf-->

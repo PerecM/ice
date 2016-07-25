@@ -153,6 +153,7 @@ public class Sample implements DataModel {
         if (entry != null)
             sample.setPartId(entry.getId());
         sample.setCreationTime(creationTime.getTime());
+//        sample.setLocation(storage.toDataTransferObject());
         return sample;
     }
 }

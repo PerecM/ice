@@ -17,7 +17,7 @@ public class SamplePlateTest {
     public void setUp() throws Exception {
         HibernateUtil.initializeMock();
         HibernateUtil.beginTransaction();
-        service = new SamplePlate();
+//        service = new SamplePlate();
     }
 
     @After

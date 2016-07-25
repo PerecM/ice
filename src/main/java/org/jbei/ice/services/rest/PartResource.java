@@ -493,21 +493,25 @@ public class PartResource extends RestResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}/samples")
-    public Response getSamples(@PathParam("id") long partId,
-                               @DefaultValue("false") @QueryParam("fetch_all") boolean fetchAll) {
+    public Response getSamples(@PathParam("id") long partId) {
         String userId = requireUserId();
         ArrayList<PartSample> partSamples = sampleService.retrieveEntrySamples(userId, partId);
 
-        if (fetchAll) {
-            ArrayList<SamplePlate> allSamples = new ArrayList<>();
-            for (int i = 0; i < partSamples.size(); i++) {
-                String tubeBarcode = partSamples.get(i).getLocation().getChild().getChild().getDisplay();// TODO: 7/22/16
+        ArrayList<SamplePlate> plates = new ArrayList<>();
+
+        for (PartSample partSample : partSamples) {
+            try { //// TODO: 7/26/16 take care of childless plates/wells???
+                String tubeBarcode = partSample.getLocation().getChild().getChild().getDisplay();
                 SamplePlate samplePlate = sampleService.getSamplesOnPlateByTubeBarcode(userId, tubeBarcode);
-                allSamples.add(samplePlate);
+                plates.add(samplePlate);
+            } catch (NullPointerException e) {
             }
-            return super.respond(allSamples);
         }
-        return super.respond(partSamples);
+
+        EntrySamples entrySamples = new EntrySamples();
+        entrySamples.setPlates(plates);
+        entrySamples.setPartSamples(partSamples);
+        return super.respond(entrySamples);
     }
 
     @POST

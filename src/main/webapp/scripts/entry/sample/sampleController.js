@@ -13,39 +13,90 @@ angular.module('ice.entry.sample.controller', [])
                                                    Util, SampleService) {
         var sessionId = $cookieStore.get("sessionId");
         var partId = $stateParams.id;
+        // $scope.hasData = false;
 
         $scope.Plate96Rows = SampleService.getPlate96Rows();
         $scope.Plate96Cols = SampleService.getPlate96Cols();
 
-        // retrieve samples for partId
-        Util.list('rest/parts/' + partId + '/samples', function (result) {
-            $scope.samples = result;
+        Util.get('rest/parts/' + partId + '/samples', function (result) {
+            $scope.entrySamples = result;
+            console.log($scope.entrySamples);
+            $scope.plates = $scope.entrySamples.plates;
+            $scope.samples = $scope.entrySamples.partSamples;
         });
 
-        // marks the sample object "inCart" field if the data
-        // contains the entry id of current part being viewed
-        //var setInCart = function (data) {
-        //    if (!data || !data.length) {
-        //        $scope.samples[0].inCart = false;
-        //        return;
-        //    }
-        //
-        //    // check specific values added to cart
-        //    for (var idx = 0; idx < data.length; idx += 1) {
-        //        // using "==" instead of "===" since partId is a string
-        //        if (data[idx].partData.id == partId) {
-        //            $scope.samples[0].inCart = true;
-        //            return;
-        //        }
-        //    }
-        //
-        //    // assuming not found
-        //    $scope.samples[0].inCart = false;
-        //};
+
+        /*
+        Util.list('rest/parts/' + partId + '/samples', function (result) {
+           $scope.samples = result;
+            Util.list('rest/parts/' + partId + '/samples', function (result) {
+                $scope.plates = result; // this is an array of objects
+                // $scope.samples = [];
+                // for (var plateInd = 0; plateInd < $scope.plates.length; plateInd++) { // for each plate
+                //     for (var row = 0; row < $scope.plates[plateInd].rows; row++) { // for each row
+                //         for (var col = 0; col < $scope.plates[plateInd].cols; col++) { //for each column
+                //             if ($scope.plates[plateInd].samplesOnPlate[row][col] != null && $scope.plates[plateInd].samplesOnPlate[row][col].partId == partId) {
+                //                 $scope.samples.push($scope.plates[plateInd].samplesOnPlate[row][col]);
+                //             }
+                //         }
+                //     }
+                // }
+                // $scope.hasData = true;
+                console.log($scope.samples.length);
+                console.log($scope.samples[0].location.type);
+                console.log($scope.plates);
+                
+                 Object fields that we might need:
+                 plateBarcode
+                 rows
+                 cols
+                 samplesOnPlate (Array:
+                 partId
+                 location:
+                 id
+                 display
+                 type
+                 name
+                 )
+
+                // console.log($scope.samples);
+                // console.log($scope.samples[0]);
+                // console.log($scope.samples[0].samplesOnPlate[1][6].location.display);
+            }, {fetch_all: true});
+
+        });
+
+
+        */
+
+
+        /*
+        //marks the sample object "inCart" field if the data
+        //contains the entry id of current part being viewed
+        var setInCart = function (data) {
+           if (!data || !data.length) {
+               $scope.samples[0].inCart = false;
+               return;
+           }
+
+           // check specific values added to cart
+           for (var idx = 0; idx < data.length; idx += 1) {
+               // using "==" instead of "===" since partId is a string
+               if (data[idx].partData.id == partId) {
+                   $scope.samples[0].inCart = true;
+                   return;
+               }
+           }
+
+           // assuming not found
+           $scope.samples[0].inCart = false;
+        };
+        */
 
         $scope.isAddGene = function (samples) {
-            if (!samples || !samples.length)
+            if (!samples || !samples.length) {
                 return false;
+            }
 
             for (var i = 0; i < samples.length; i += 1) {
                 if (samples[i].location.type == 'ADDGENE')

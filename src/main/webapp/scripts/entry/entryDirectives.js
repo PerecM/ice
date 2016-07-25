@@ -5,6 +5,7 @@ angular.module('ice.entry.directives', [])
         return {
             scope:{
                 sample:"=",
+                plate:"=",
                 delete:"&onDelete",
                 remote:"="
             },

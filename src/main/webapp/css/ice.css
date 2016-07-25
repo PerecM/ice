@@ -196,6 +196,11 @@ html, body {
     opacity: 1;
 }
 
+.contains_sample:hover, .contains_color {
+    color: darkgray;
+    opacity: 1;
+}
+
 .flag_icon:hover, .alert_color {
     color: #ff8823;
     opacity: 1;

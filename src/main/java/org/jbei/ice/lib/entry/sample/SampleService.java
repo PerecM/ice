@@ -231,60 +231,60 @@ public class SampleService {
         if (entrySamples == null)
             return samples;
 
-        boolean inCart = false;
-        if (userId != null) {
-            Account userAccount = DAOFactory.getAccountDAO().getByEmail(userId);
-            inCart = DAOFactory.getRequestDAO().getSampleRequestInCart(userAccount, entry) != null;
-        }
+        boolean inCart = isInCart(entry, userId);
+//        if (userId != null) {
+//            Account userAccount = DAOFactory.getAccountDAO().getByEmail(userId);
+//            inCart = DAOFactory.getRequestDAO().getSampleRequestInCart(userAccount, entry) != null;
+//        }
 
         for (Sample sample : entrySamples) {
-            // convert sample to info
-            Storage storage = sample.getStorage();
-            if (storage == null) {
-                // dealing with sample with no storage
-                PartSample generic = sample.toDataTransferObject();
-                StorageLocation location = new StorageLocation();
-                location.setType(SampleType.GENERIC);
-                location.setDisplay(sample.getLabel());
-                generic.setLocation(location);
-                generic = setAccountInfo(generic, sample.getDepositor());
-                samples.add(generic);
-                continue;
-            }
+//            // convert sample to info
+//            Storage storage = sample.getStorage();
+//            if (storage == null) {
+//                // dealing with sample with no storage
+//                PartSample generic = sample.toDataTransferObject();
+//                StorageLocation location = new StorageLocation();
+//                location.setType(SampleType.GENERIC);
+//                location.setDisplay(sample.getLabel());
+//                generic.setLocation(location);
+//                generic = setAccountInfo(generic, sample.getDepositor());
+//                samples.add(generic);
+//                continue;
+//            }
+//
+//            StorageLocation storageLocation = storage.toDataTransferObject();
+//
+//            while (storage.getParent() != null) {
+//                storage = storage.getParent();
+//                StorageLocation parentLocation = storage.toDataTransferObject();
+//                parentLocation.setChild(storageLocation);
+//                storageLocation = parentLocation;
+//
+//                boolean isParent = (storageLocation.getType() != null && storageLocation.getType().isTopLevel());
+//                if (isParent)
+//                    break;
+//            }
+//
+//            // get specific sample type and details about it
+//            PartSample partSample = new PartSample();
+//            partSample.setId(sample.getId());
+//            partSample.setCreationTime(sample.getCreationTime().getTime());
+//            partSample.setLabel(sample.getLabel());
+//            partSample.setLocation(storageLocation);
+//            partSample.setInCart(inCart);
+//            partSample = setAccountInfo(partSample, sample.getDepositor());
+//            partSample.setCanEdit(sampleAuthorization.canWrite(userId, sample));
+//
+//            if (sample.getComments() != null) {
+//                for (Comment comment : sample.getComments()) {
+//                    UserComment userComment = new UserComment();
+//                    userComment.setId(comment.getId());
+//                    userComment.setMessage(comment.getBody());
+//                    partSample.getComments().add(userComment);
+//                }
+//            }
 
-            StorageLocation storageLocation = storage.toDataTransferObject();
-
-            while (storage.getParent() != null) {
-                storage = storage.getParent();
-                StorageLocation parentLocation = storage.toDataTransferObject();
-                parentLocation.setChild(storageLocation);
-                storageLocation = parentLocation;
-
-                boolean isParent = (storageLocation.getType() != null && storageLocation.getType().isTopLevel());
-                if (isParent)
-                    break;
-            }
-
-            // get specific sample type and details about it
-            PartSample partSample = new PartSample();
-            partSample.setId(sample.getId());
-            partSample.setCreationTime(sample.getCreationTime().getTime());
-            partSample.setLabel(sample.getLabel());
-            partSample.setLocation(storageLocation);
-            partSample.setInCart(inCart);
-            partSample = setAccountInfo(partSample, sample.getDepositor());
-            partSample.setCanEdit(sampleAuthorization.canWrite(userId, sample));
-
-            if (sample.getComments() != null) {
-                for (Comment comment : sample.getComments()) {
-                    UserComment userComment = new UserComment();
-                    userComment.setId(comment.getId());
-                    userComment.setMessage(comment.getBody());
-                    partSample.getComments().add(userComment);
-                }
-            }
-
-            samples.add(partSample);
+            samples.add(convertSampleToInfo(sample, inCart, userId));
         }
 
         return samples;
@@ -411,12 +411,82 @@ public class SampleService {
                 continue;
 
             Storage sampleWell = sample.getStorage().getParent();
+            PartSample partSample = convertSampleToInfo(sample, isInCart(entry, userId), userId);
             try {
-                samplesByPlate.insertSample(sample.toDataTransferObject(), sampleWell);
+                samplesByPlate.insertSample(partSample, sampleWell);
             } catch (Exception e) {
                 Logger.error("Well " + sampleWell.getIndex() + " already contains a sample.");
             }
         }
         return samplesByPlate;
+    }
+
+    /**
+     *
+     * @param sample
+     * @param inCart
+     * @param userId
+     * @return
+     */
+    private PartSample convertSampleToInfo(Sample sample, boolean inCart, String userId) {
+        Storage storage = sample.getStorage();
+        if (storage == null) {
+            // dealing with sample with no storage
+            PartSample generic = sample.toDataTransferObject();
+            StorageLocation location = new StorageLocation();
+            location.setType(SampleType.GENERIC);
+            location.setDisplay(sample.getLabel());
+            generic.setLocation(location);
+            generic = setAccountInfo(generic, sample.getDepositor());
+            return generic;
+        }
+
+        StorageLocation storageLocation = storage.toDataTransferObject();
+
+        while (storage.getParent() != null) {
+            storage = storage.getParent();
+            StorageLocation parentLocation = storage.toDataTransferObject();
+            parentLocation.setChild(storageLocation);
+            storageLocation = parentLocation;
+
+            boolean isParent = (storageLocation.getType() != null && storageLocation.getType().isTopLevel());
+            if (isParent)
+                break;
+        }
+
+        // get specific sample type and details about it
+        PartSample partSample = new PartSample();
+        partSample.setId(sample.getId());
+        partSample.setCreationTime(sample.getCreationTime().getTime());
+        partSample.setLabel(sample.getLabel());
+        partSample.setLocation(storageLocation);
+        partSample.setInCart(inCart);
+        partSample.setPartId(sample.getEntry().getId());
+        partSample = setAccountInfo(partSample, sample.getDepositor());
+        partSample.setCanEdit(sampleAuthorization.canWrite(userId, sample));
+
+        if (sample.getComments() != null) {
+            for (Comment comment : sample.getComments()) {
+                UserComment userComment = new UserComment();
+                userComment.setId(comment.getId());
+                userComment.setMessage(comment.getBody());
+                partSample.getComments().add(userComment);
+            }
+        }
+        return partSample;
+    }
+
+    /**
+     *
+     * @param entry
+     * @param userId
+     * @return
+     */
+    private boolean isInCart(Entry entry, String userId) {
+        if (userId != null) {
+            Account userAccount = DAOFactory.getAccountDAO().getByEmail(userId);
+            return DAOFactory.getRequestDAO().getSampleRequestInCart(userAccount, entry) != null;
+        }
+        return false;
     }
 }
