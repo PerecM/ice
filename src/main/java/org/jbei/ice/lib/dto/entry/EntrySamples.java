@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  * Class to transfer data:
- * all samples on the plates for a particular entry,
+ * all samples (stored on the plates) for a particular entry,
  * and all other samples that are stored on those plates.
  *
  * @author Elena Aravina

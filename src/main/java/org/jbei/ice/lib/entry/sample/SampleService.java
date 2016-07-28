@@ -232,58 +232,8 @@ public class SampleService {
             return samples;
 
         boolean inCart = isInCart(entry, userId);
-//        if (userId != null) {
-//            Account userAccount = DAOFactory.getAccountDAO().getByEmail(userId);
-//            inCart = DAOFactory.getRequestDAO().getSampleRequestInCart(userAccount, entry) != null;
-//        }
 
         for (Sample sample : entrySamples) {
-//            // convert sample to info
-//            Storage storage = sample.getStorage();
-//            if (storage == null) {
-//                // dealing with sample with no storage
-//                PartSample generic = sample.toDataTransferObject();
-//                StorageLocation location = new StorageLocation();
-//                location.setType(SampleType.GENERIC);
-//                location.setDisplay(sample.getLabel());
-//                generic.setLocation(location);
-//                generic = setAccountInfo(generic, sample.getDepositor());
-//                samples.add(generic);
-//                continue;
-//            }
-//
-//            StorageLocation storageLocation = storage.toDataTransferObject();
-//
-//            while (storage.getParent() != null) {
-//                storage = storage.getParent();
-//                StorageLocation parentLocation = storage.toDataTransferObject();
-//                parentLocation.setChild(storageLocation);
-//                storageLocation = parentLocation;
-//
-//                boolean isParent = (storageLocation.getType() != null && storageLocation.getType().isTopLevel());
-//                if (isParent)
-//                    break;
-//            }
-//
-//            // get specific sample type and details about it
-//            PartSample partSample = new PartSample();
-//            partSample.setId(sample.getId());
-//            partSample.setCreationTime(sample.getCreationTime().getTime());
-//            partSample.setLabel(sample.getLabel());
-//            partSample.setLocation(storageLocation);
-//            partSample.setInCart(inCart);
-//            partSample = setAccountInfo(partSample, sample.getDepositor());
-//            partSample.setCanEdit(sampleAuthorization.canWrite(userId, sample));
-//
-//            if (sample.getComments() != null) {
-//                for (Comment comment : sample.getComments()) {
-//                    UserComment userComment = new UserComment();
-//                    userComment.setId(comment.getId());
-//                    userComment.setMessage(comment.getBody());
-//                    partSample.getComments().add(userComment);
-//                }
-//            }
-
             samples.add(convertSampleToInfo(sample, inCart, userId));
         }
 
