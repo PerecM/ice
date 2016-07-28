@@ -196,9 +196,13 @@ html, body {
     opacity: 1;
 }
 
-.contains_sample:hover, .contains_color {
-    color: darkgray;
+.contains_sample:hover {
+    color: dimgrey;
     opacity: 1;
+}
+.contains_sample {
+    color: dimgrey;
+    opacity: 0.3;
 }
 
 .flag_icon:hover, .alert_color {

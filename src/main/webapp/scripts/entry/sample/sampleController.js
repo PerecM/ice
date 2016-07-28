@@ -1,13 +1,18 @@
 'use strict';
 
 angular.module('ice.entry.sample.controller', [])
-    .controller('DisplaySampleController', function ($rootScope, $scope, SampleService) {
+    .controller('DisplaySampleController', function ($rootScope, $scope, SampleService, Util, $location) {
         $scope.Plate96Rows = SampleService.getPlate96Rows();
         $scope.Plate96Cols = SampleService.getPlate96Cols();
 
         $scope.canDelete = function () {
             return !$scope.remote && $rootScope.user && $rootScope.user.isAdmin;
-        }
+        };
+
+        $scope.moveToSampleEntry = function (partId) {
+            console.log("Hi");
+            $location.path("entry/" + partId);
+        };
     })
     .controller('EntrySampleController', function ($location, $rootScope, $scope, $uibModal, $cookieStore, $stateParams,
                                                    Util, SampleService) {
@@ -24,51 +29,6 @@ angular.module('ice.entry.sample.controller', [])
             $scope.plates = $scope.entrySamples.plates;
             $scope.samples = $scope.entrySamples.partSamples;
         });
-
-
-        /*
-        Util.list('rest/parts/' + partId + '/samples', function (result) {
-           $scope.samples = result;
-            Util.list('rest/parts/' + partId + '/samples', function (result) {
-                $scope.plates = result; // this is an array of objects
-                // $scope.samples = [];
-                // for (var plateInd = 0; plateInd < $scope.plates.length; plateInd++) { // for each plate
-                //     for (var row = 0; row < $scope.plates[plateInd].rows; row++) { // for each row
-                //         for (var col = 0; col < $scope.plates[plateInd].cols; col++) { //for each column
-                //             if ($scope.plates[plateInd].samplesOnPlate[row][col] != null && $scope.plates[plateInd].samplesOnPlate[row][col].partId == partId) {
-                //                 $scope.samples.push($scope.plates[plateInd].samplesOnPlate[row][col]);
-                //             }
-                //         }
-                //     }
-                // }
-                // $scope.hasData = true;
-                console.log($scope.samples.length);
-                console.log($scope.samples[0].location.type);
-                console.log($scope.plates);
-                
-                 Object fields that we might need:
-                 plateBarcode
-                 rows
-                 cols
-                 samplesOnPlate (Array:
-                 partId
-                 location:
-                 id
-                 display
-                 type
-                 name
-                 )
-
-                // console.log($scope.samples);
-                // console.log($scope.samples[0]);
-                // console.log($scope.samples[0].samplesOnPlate[1][6].location.display);
-            }, {fetch_all: true});
-
-        });
-
-
-        */
-
 
         /*
         //marks the sample object "inCart" field if the data
