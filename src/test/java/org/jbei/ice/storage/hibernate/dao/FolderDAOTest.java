@@ -57,19 +57,7 @@ public class FolderDAOTest {
         folder = dao.create(folder);
         Assert.assertNotNull(folder);
 
-        List<Entry> entries = new ArrayList<>();
-        EntryCreator creator = new EntryCreator();
-
-        // create 10 entries
-        for (int i = 0; i < 10; i += 1) {
-            Part part = new Part();
-            part.setName("name" + i);
-            part.setOwnerEmail(email);
-            part.setAlias("alias" + i);
-            part.setShortDescription("short description");
-            Entry entry = creator.createEntry(account, part, null);
-            entries.add(entry);
-        }
+        List<Entry> entries = createEntries(email, account, 9);
 
         // add entries to folder
         folder = dao.addFolderContents(folder, entries);
@@ -97,19 +85,7 @@ public class FolderDAOTest {
         folder = dao.create(folder);
         Assert.assertNotNull(folder);
 
-        List<Entry> entries = new ArrayList<>();
-        EntryCreator creator = new EntryCreator();
-
-        // create 10 entries
-        for (int i = 0; i < 10; i += 1) {
-            Part part = new Part();
-            part.setName("name" + i);
-            part.setOwnerEmail(email);
-            part.setAlias("alias" + i);
-            part.setShortDescription("short description");
-            Entry entry = creator.createEntry(account, part, null);
-            entries.add(entry);
-        }
+        List<Entry> entries = createEntries(email, account, 9);
 
         // add entries to folder
         folder = dao.addFolderContents(folder, entries);
@@ -141,19 +117,7 @@ public class FolderDAOTest {
         folder = dao.create(folder);
         Assert.assertNotNull(folder);
 
-        List<Entry> entries = new ArrayList<>();
-        EntryCreator creator = new EntryCreator();
-
-        // create 10 entries
-        for (int i = 0; i < 10; i += 1) {
-            Part part = new Part();
-            part.setName("name" + i);
-            part.setOwnerEmail(email);
-            part.setAlias("alias" + i);
-            part.setShortDescription("short description");
-            Entry entry = creator.createEntry(account, part, null);
-            entries.add(entry);
-        }
+        List<Entry> entries = createEntries(email, account, 10);
 
         // add entries to folder
         folder = dao.addFolderContents(folder, entries);
@@ -170,19 +134,7 @@ public class FolderDAOTest {
         folder = dao.create(folder);
         Assert.assertNotNull(folder);
 
-        List<Entry> entries = new ArrayList<>();
-        EntryCreator creator = new EntryCreator();
-
-        // create 10 entries
-        for (int i = 0; i < 10; i += 1) {
-            Part part = new Part();
-            part.setName("name" + i);
-            part.setOwnerEmail(email);
-            part.setAlias("alias" + i);
-            part.setShortDescription("short description");
-            Entry entry = creator.createEntry(account, part, null);
-            entries.add(entry);
-        }
+        List<Entry> entries = createEntries(email, account, 10);
 
         // add entries to folder
         folder = dao.addFolderContents(folder, entries);
@@ -197,19 +149,7 @@ public class FolderDAOTest {
         folder = dao.create(folder);
         Assert.assertNotNull(folder);
 
-        // add entries to folder
-        EntryCreator creator = new EntryCreator();
-        List<Entry> entries = new ArrayList<>();
-
-        for (int i = 1; i <= 9; i += 1) {
-            Part part = new Part();
-            part.setName("name" + i);
-            part.setOwnerEmail(email);
-            part.setAlias("alias" + i);
-            part.setShortDescription("short description");
-            Entry entry = creator.createEntry(account, part, null);
-            entries.add(entry);
-        }
+        List<Entry> entries = createEntries(email, account, 9);
 
         // add to folder
         folder = dao.addFolderContents(folder, entries);
@@ -217,8 +157,8 @@ public class FolderDAOTest {
 
         List<Entry> result = dao.retrieveFolderContents(folder.getId(), new PageParameters(0, 15, ColumnField.NAME, true, null), false);
         Assert.assertNotNull(result);
-        for (int i = 1; i <= 9; i += 1) {
-            Entry entry = result.get(i - 1);
+        for (int i = 0; i <= 9; i += 1) {
+            Entry entry = result.get(i);
             Assert.assertEquals(entry.getName(), "name" + i);
         }
     }
@@ -230,5 +170,21 @@ public class FolderDAOTest {
         folder.setOwnerEmail(ownerEmail);
         folder.setPropagatePermissions(false);
         return folder;
+    }
+
+    private List<Entry> createEntries(String email, Account account, int num) {
+        EntryCreator creator = new EntryCreator();
+        List<Entry> entries = new ArrayList<>();
+
+        for (int i = 0; i <= num; i += 1) {
+            Part part = new Part();
+            part.setName("name" + i);
+            part.setOwnerEmail(email);
+            part.setAlias("alias" + i);
+            part.setShortDescription("short description");
+            Entry entry = creator.createEntry(account, part, null);
+            entries.add(entry);
+        }
+        return entries;
     }
 }

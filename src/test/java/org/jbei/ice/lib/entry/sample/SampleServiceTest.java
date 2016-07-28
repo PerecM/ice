@@ -6,18 +6,23 @@ import org.jbei.ice.lib.account.AccountTransfer;
 import org.jbei.ice.lib.dto.StorageLocation;
 import org.jbei.ice.lib.dto.comment.UserComment;
 import org.jbei.ice.lib.dto.sample.PartSample;
+import org.jbei.ice.lib.dto.sample.SamplePlate;
 import org.jbei.ice.lib.dto.sample.SampleType;
 import org.jbei.ice.storage.DAOFactory;
 import org.jbei.ice.storage.hibernate.HibernateUtil;
 import org.jbei.ice.storage.model.Account;
 import org.jbei.ice.storage.model.Storage;
 import org.jbei.ice.storage.model.Strain;
+import org.jbei.ice.storage.hibernate.dao.SampleDAO;
+import org.jbei.ice.storage.model.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Hector Plahar, Elena Aravina
@@ -25,12 +30,14 @@ import java.util.List;
 public class SampleServiceTest {
 
     private SampleService service;
+    private SampleDAO dao;
 
     @Before
     public void setUp() throws Exception {
         HibernateUtil.initializeMock();
         HibernateUtil.beginTransaction();
         service = new SampleService();
+        dao = new SampleDAO();
     }
 
     @After
@@ -287,7 +294,96 @@ public class SampleServiceTest {
     }
 
     @Test
-    public void testGetSamplesOnPlateByTubeBarcode() {
+    public void testGetSamplesOnPlateByTubeBarcode() throws Exception {
+        Account account = AccountCreator.createTestAccount("SampleServiceTest.testGetSamplesOnPlateByTubeBarcode", false);
+        String userId = account.getEmail();
 
+
+        //create 3 Storages
+        Storage plateStorage = new Storage();
+        plateStorage.setStorageType(Storage.StorageType.PLATE96);
+        plateStorage.setIndex("plate");
+//        plateStorage.setId(1456254);
+
+        Storage wellStorage = new Storage();
+        wellStorage.setStorageType(Storage.StorageType.WELL);
+        wellStorage.setIndex("well");
+        wellStorage.setParent(plateStorage);
+//        wellStorage.setId(1286289364);
+
+        Storage tubeStorage = new Storage();
+        tubeStorage.setStorageType(Storage.StorageType.TUBE);
+        tubeStorage.setIndex("tube");
+//        tubeStorage.setId(84672345);
+        plateStorage.setParent(wellStorage);
+
+        //create a Sample
+        Sample sample = SampleCreator.createSampleObject("test", userId, "");
+        sample.setStorage(tubeStorage);
+
+        SamplePlate samplePlate = service.getSamplesOnPlateByTubeBarcode(userId, tubeStorage.getIndex());
+        Assert.assertNotNull(samplePlate);
+    }
+
+    @Test
+    public void testConvertSampleToInfo() throws Exception{
+        Account account = AccountCreator.createTestAccount("SampleServiceTest.testConvertSampleToInfo", false);
+        String userId = account.getEmail();
+        Strain strain = TestEntryCreator.createTestStrain(account);
+        long entryId = strain.getId();
+
+        Random random = new Random();
+        boolean inCart = random.nextBoolean();
+
+        Entry entry = DAOFactory.getEntryDAO().get(entryId);
+        ArrayList<Sample> entrySamples = dao.getSamplesByEntry(entry);
+        entrySamples.add(SampleCreator.createSampleObject("label", userId, "notes"));
+
+        for (Sample sample: entrySamples) {
+            PartSample partSample = service.convertSampleToInfo(sample, inCart, userId);
+            Assert.assertNotNull(partSample);
+
+            if (sample.getStorage() != null) { // only for non-generic
+                Assert.assertNotNull(partSample.getId());
+                Assert.assertNotNull(partSample.getLocation());
+                Assert.assertEquals(partSample.isInCart(), inCart);
+                Assert.assertNotNull(partSample.getDepositor());
+                Assert.assertNotNull(partSample.isCanEdit());
+            }
+
+            Assert.assertNotNull(partSample.getPartId());
+            Assert.assertNotNull(partSample.getLabel());
+            Assert.assertNotNull(partSample.getCreationTime());
+
+            StorageLocation location = partSample.getLocation();
+            while (location.getChild() != null) {
+                location = location.getChild();
+                Assert.assertNotNull(location.getType());
+                Assert.assertNotNull(location.getId());
+                Assert.assertNotNull(location.getDisplay());
+                Assert.assertNotNull(location.getName());
+            }
+
+            if (partSample.getComments() != null) {
+                for (UserComment comment: partSample.getComments()) {
+                    Assert.assertNotNull(comment.getId());
+                    Assert.assertNotNull(comment.getMessage());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testIsInCart() throws Exception {
+        Account account = AccountCreator.createTestAccount("SampleServiceTest.testisInCart", false);
+        String userId = account.getEmail();
+        Strain strain = TestEntryCreator.createTestStrain(account);
+        long entryId = strain.getId();
+        Entry entry = DAOFactory.getEntryDAO().get(entryId);
+
+        Assert.assertFalse(service.isInCart(entry, userId));
+        Assert.assertFalse(service.isInCart(entry, null));
+
+        // TODO: 7/28/16 how to test "true" case?
     }
 }

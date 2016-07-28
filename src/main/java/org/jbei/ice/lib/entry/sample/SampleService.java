@@ -17,7 +17,6 @@ import org.jbei.ice.storage.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Service for dealing with {@link Sample}s
@@ -330,17 +329,19 @@ public class SampleService {
      * Retrieves all samples that are stored
      * on a particular 96 well plate containing one specific tube with a known barcode.
      *
-     * @param userId
-     * @param tubeBarcode barcode (or index) of one of the plate's TUBE Storage
-     * @return wrapper object with all samples on the specified plate
+     * @param userId unique identifier for user performing action
+     * @param tubeBarcode barcode (or index) of one of the plate's TUBE {@link Storage}
+     * @return {@link SamplePlate} with all samples on the specified plate
      */
     public SamplePlate getSamplesOnPlateByTubeBarcode(String userId, String tubeBarcode) {
         Storage tube = storageDAO.retrieveStorageTube(tubeBarcode);
         if (tube == null) {
+            System.out.println("null 1");
             return null;
         }
         Storage parent = tube.getParent();
         if (parent == null) {
+            System.out.println("null 2");
             return null;
         }
         while (parent.getStorageType() != Storage.StorageType.PLATE96) {
@@ -360,7 +361,7 @@ public class SampleService {
             if (!entryAuthorization.canRead(userId, entry))
                 continue;
 
-            Storage sampleWell = sample.getStorage().getParent();
+            Storage sampleWell = sample.getStorage().getParent(); // TODO: 7/28/16 catch null 
             PartSample partSample = convertSampleToInfo(sample, isInCart(entry, userId), userId);
             try {
                 samplesByPlate.insertSample(partSample, sampleWell);
@@ -372,13 +373,14 @@ public class SampleService {
     }
 
     /**
+     * Transfers all the information from {@link Sample} object to {@link PartSample} object
      *
-     * @param sample
-     * @param inCart
-     * @param userId
-     * @return
+     * @param sample given sample to transfer info from
+     * @param inCart specifies whether the sample is added to cart or not
+     * @param userId unique identifier for user performing action
+     * @return {@link PartSample} containing all the transferred information
      */
-    private PartSample convertSampleToInfo(Sample sample, boolean inCart, String userId) {
+    public PartSample convertSampleToInfo(Sample sample, boolean inCart, String userId) {
         Storage storage = sample.getStorage();
         if (storage == null) {
             // dealing with sample with no storage
@@ -427,12 +429,13 @@ public class SampleService {
     }
 
     /**
+     * Checks if a particular sample is added to cart or not
      *
-     * @param entry
-     * @param userId
-     * @return
+     * @param entry {@link Entry} whose sample is checked for being in cart
+     * @param userId unique identifier for user performing action
+     * @return sample is in cart/ not in cart
      */
-    private boolean isInCart(Entry entry, String userId) {
+    public boolean isInCart(Entry entry, String userId) {
         if (userId != null) {
             Account userAccount = DAOFactory.getAccountDAO().getByEmail(userId);
             return DAOFactory.getRequestDAO().getSampleRequestInCart(userAccount, entry) != null;
