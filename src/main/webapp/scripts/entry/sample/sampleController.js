@@ -10,7 +10,6 @@ angular.module('ice.entry.sample.controller', [])
         };
 
         $scope.moveToSampleEntry = function (partId) {
-            console.log("Hi");
             $location.path("entry/" + partId);
         };
     })
@@ -18,7 +17,6 @@ angular.module('ice.entry.sample.controller', [])
                                                    Util, SampleService) {
         var sessionId = $cookieStore.get("sessionId");
         var partId = $stateParams.id;
-        // $scope.hasData = false;
 
         $scope.Plate96Rows = SampleService.getPlate96Rows();
         $scope.Plate96Cols = SampleService.getPlate96Cols();
@@ -26,8 +24,8 @@ angular.module('ice.entry.sample.controller', [])
         Util.get('rest/parts/' + partId + '/samples', function (result) {
             $scope.entrySamples = result;
             console.log($scope.entrySamples);
-            $scope.plates = $scope.entrySamples.plates;
-            $scope.samples = $scope.entrySamples.partSamples;
+            $scope.plates = $scope.entrySamples.plates; // list of plates
+            $scope.samples = $scope.entrySamples.partSamples; // list of samples for this entry
         });
 
         /*
@@ -200,7 +198,7 @@ angular.module('ice.entry.sample.controller', [])
             return false;
         };
 
-        // has either well or t
+        // has either well or tube
         $scope.hasContent = function (row, col) {
             var rc = row + (10 + col + '').slice(-2);
             var recurse = $scope.newSample.location;

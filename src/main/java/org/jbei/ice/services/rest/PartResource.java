@@ -18,7 +18,6 @@ import org.jbei.ice.lib.dto.common.Results;
 import org.jbei.ice.lib.dto.entry.*;
 import org.jbei.ice.lib.dto.sample.PartSample;
 import org.jbei.ice.lib.dto.sample.SamplePlate;
-import org.jbei.ice.lib.dto.sample.SampleType;
 import org.jbei.ice.lib.dto.web.RegistryPartner;
 import org.jbei.ice.lib.entry.*;
 import org.jbei.ice.lib.entry.attachment.AttachmentController;
@@ -37,7 +36,6 @@ import org.jbei.ice.storage.hibernate.dao.ShotgunSequenceDAO;
 import org.jbei.ice.storage.hibernate.dao.StorageDAO;
 import org.jbei.ice.storage.model.Entry;
 import org.jbei.ice.storage.model.ShotgunSequence;
-import org.jbei.ice.storage.model.Storage;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;

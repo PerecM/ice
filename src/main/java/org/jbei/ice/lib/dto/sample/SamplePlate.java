@@ -42,9 +42,6 @@ public class SamplePlate implements IDataTransferModel {
     }
 
     public void insertSample(PartSample sample, Storage well) throws Exception {
-
-
-
         String wellBarcode = well.getIndex();
         int row = getRow(wellBarcode);
         int col = getCol(wellBarcode);
