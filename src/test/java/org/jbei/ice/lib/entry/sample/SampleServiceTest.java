@@ -298,24 +298,20 @@ public class SampleServiceTest {
         Account account = AccountCreator.createTestAccount("SampleServiceTest.testGetSamplesOnPlateByTubeBarcode", false);
         String userId = account.getEmail();
 
-
         //create 3 Storages
         Storage plateStorage = new Storage();
         plateStorage.setStorageType(Storage.StorageType.PLATE96);
         plateStorage.setIndex("plate");
-//        plateStorage.setId(1456254);
 
         Storage wellStorage = new Storage();
         wellStorage.setStorageType(Storage.StorageType.WELL);
         wellStorage.setIndex("well");
         wellStorage.setParent(plateStorage);
-//        wellStorage.setId(1286289364);
 
         Storage tubeStorage = new Storage();
         tubeStorage.setStorageType(Storage.StorageType.TUBE);
         tubeStorage.setIndex("tube");
-//        tubeStorage.setId(84672345);
-        plateStorage.setParent(wellStorage);
+        tubeStorage.setParent(wellStorage);
 
         //create a Sample
         Sample sample = SampleCreator.createSampleObject("test", userId, "");
