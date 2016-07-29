@@ -298,26 +298,29 @@ public class SampleServiceTest {
         Account account = AccountCreator.createTestAccount("SampleServiceTest.testGetSamplesOnPlateByTubeBarcode", false);
         String userId = account.getEmail();
 
+        Strain strain = TestEntryCreator.createTestStrain(account);
+        PartSample partSample = new PartSample();
+        partSample.setLabel("testGetSamplesOnPlateByTubeBarcode");
+
         //create 3 Storages
-        Storage plateStorage = new Storage();
-        plateStorage.setStorageType(Storage.StorageType.PLATE96);
-        plateStorage.setIndex("plate");
+        StorageLocation plateStorage = new StorageLocation();
+        plateStorage.setType(SampleType.PLATE96);
+        plateStorage.setDisplay("plate101");
 
-        Storage wellStorage = new Storage();
-        wellStorage.setStorageType(Storage.StorageType.WELL);
-        wellStorage.setIndex("well");
-        wellStorage.setParent(plateStorage);
+        StorageLocation wellStorage = new StorageLocation();
+        wellStorage.setType(SampleType.WELL);
+        wellStorage.setDisplay("well101");
+        plateStorage.setChild(wellStorage);
 
-        Storage tubeStorage = new Storage();
-        tubeStorage.setStorageType(Storage.StorageType.TUBE);
-        tubeStorage.setIndex("tube");
-        tubeStorage.setParent(wellStorage);
+        StorageLocation tubeStorage = new StorageLocation();
+        tubeStorage.setType(SampleType.TUBE);
+        tubeStorage.setDisplay("tube101");
+        wellStorage.setChild(tubeStorage);
 
-        //create a Sample
-        Sample sample = SampleCreator.createSampleObject("test", userId, "");
-        sample.setStorage(tubeStorage);
+        partSample.setLocation(plateStorage);
+        partSample = service.createSample(userId, strain.getId(), partSample, null);
 
-        SamplePlate samplePlate = service.getSamplesOnPlateByTubeBarcode(userId, tubeStorage.getIndex());
+        SamplePlate samplePlate = service.getSamplesOnPlateByTubeBarcode(userId, tubeStorage.getDisplay());
         Assert.assertNotNull(samplePlate);
     }
 

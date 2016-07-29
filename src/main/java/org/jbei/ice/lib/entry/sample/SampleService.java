@@ -336,12 +336,10 @@ public class SampleService {
     public SamplePlate getSamplesOnPlateByTubeBarcode(String userId, String tubeBarcode) {
         Storage tube = storageDAO.retrieveStorageTube(tubeBarcode);
         if (tube == null) {
-            System.out.println("null 1");
             return null;
         }
         Storage parent = tube.getParent();
         if (parent == null) {
-            System.out.println("null 2");
             return null;
         }
         while (parent.getStorageType() != Storage.StorageType.PLATE96) {

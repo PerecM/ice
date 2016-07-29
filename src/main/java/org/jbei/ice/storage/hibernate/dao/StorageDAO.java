@@ -34,7 +34,6 @@ public class StorageDAO extends HibernateRepository<Storage> {
         List<Storage> results = retrieveStorageByIndex(barcode, SampleType.TUBE);
 
         if (results == null || results.isEmpty()) {
-            System.out.println("HERE");
             return null;
         }
 
@@ -64,7 +63,6 @@ public class StorageDAO extends HibernateRepository<Storage> {
 
             List<Storage> list = query.list();
             if (list != null) {
-                System.out.println(list);
                 result = list;
             }
         } catch (Exception e) {
@@ -72,7 +70,6 @@ public class StorageDAO extends HibernateRepository<Storage> {
             Logger.error(msg, e);
             throw new DAOException(msg);
         }
-        System.out.println(result);
         return result;
     }
 
