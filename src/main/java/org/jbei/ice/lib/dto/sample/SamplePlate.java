@@ -41,13 +41,20 @@ public class SamplePlate implements IDataTransferModel {
         return samplesOnPlate;
     }
 
-    public void insertSample(PartSample sample, Storage well) throws Exception {
+    /**
+     *
+     * @param sample {@link PartSample} to insert in the plate structure
+     * @param well where to insert {@link PartSample}
+     * @return if the insertion was successful
+     * @throws Exception
+     */
+    public boolean insertSample(PartSample sample, Storage well) throws Exception {
         String wellBarcode = well.getIndex();
         int row = getRow(wellBarcode);
         int col = getCol(wellBarcode);
 
-        if (row >= rows || col >= cols) { //do we need this?
-            return;
+        if (row >= rows || col >= cols || row < 0 || col < 0) {
+            return false;
         }
 
         if (this.samplesOnPlate[row][col] != null) {
@@ -55,13 +62,17 @@ public class SamplePlate implements IDataTransferModel {
         }
 
         this.samplesOnPlate[row][col] = sample;
+        return true;
     }
 
-    private int getRow(String wellBarcode) {
+    public int getRow(String wellBarcode) {
         return (int) wellBarcode.charAt(0) - 65;
     }
 
-    private int getCol(String wellBarcode) {
+    public int getCol(String wellBarcode) {
+        if (wellBarcode.length() < 3) {
+            return -1;
+        }
         String col = wellBarcode.substring(1);
         if (col.charAt(0) == '0') {
             col = col.substring(1);

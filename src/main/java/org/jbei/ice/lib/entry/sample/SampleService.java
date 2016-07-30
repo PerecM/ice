@@ -362,7 +362,9 @@ public class SampleService {
             Storage sampleWell = sample.getStorage().getParent(); // TODO: 7/28/16 catch null 
             PartSample partSample = convertSampleToInfo(sample, isInCart(entry, userId), userId);
             try {
-                samplesByPlate.insertSample(partSample, sampleWell);
+                if(!samplesByPlate.insertSample(partSample, sampleWell)) {
+                    Logger.error("Well index has wrong format: " + sampleWell.getIndex());
+                }
             } catch (Exception e) {
                 Logger.error("Well " + sampleWell.getIndex() + " already contains a sample.");
             }
