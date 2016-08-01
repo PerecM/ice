@@ -359,7 +359,10 @@ public class SampleService {
             if (!entryAuthorization.canRead(userId, entry))
                 continue;
 
-            Storage sampleWell = sample.getStorage().getParent(); // TODO: 7/28/16 catch null 
+            if (sample.getStorage() == null || sample.getStorage().getParent() == null) {
+                continue;
+            }
+            Storage sampleWell = sample.getStorage().getParent();
             PartSample partSample = convertSampleToInfo(sample, isInCart(entry, userId), userId);
             try {
                 if(!samplesByPlate.insertSample(partSample, sampleWell)) {
