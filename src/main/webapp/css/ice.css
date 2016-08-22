@@ -197,12 +197,12 @@ html, body {
 }
 
 .contains_sample:hover {
-    color: dimgrey;
-    opacity: 1;
+    color: green;
+
 }
 .contains_sample {
-    color: dimgrey;
-    opacity: 0.3;
+    color: darkgrey;
+
 }
 
 .flag_icon:hover, .alert_color {

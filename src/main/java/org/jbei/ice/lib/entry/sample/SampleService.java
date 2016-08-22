@@ -17,6 +17,7 @@ import org.jbei.ice.storage.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service for dealing with {@link Sample}s
@@ -342,7 +343,7 @@ public class SampleService {
         if (parent == null) {
             return null;
         }
-        while (parent.getStorageType() != Storage.StorageType.PLATE96) {
+        while (parent.getStorageType() != Storage.StorageType.PLATE96) { // TODO: 8/22/16 rewrite to take care of null parents?
             parent = parent.getParent();
         }
 

@@ -9,8 +9,8 @@ import org.jbei.ice.storage.model.Storage;
  * @author Elena Aravina
  */
 public class SamplePlate implements IDataTransferModel {
-    private final int DEFAULT_ROWS = 8;
-    private final int DEFAULT_COLS = 12;
+    private static final int DEFAULT_ROWS = 8;
+    private static final int DEFAULT_COLS = 12;
 
     private String plateBarcode;
     private int rows;

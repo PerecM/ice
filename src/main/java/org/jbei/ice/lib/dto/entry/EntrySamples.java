@@ -24,7 +24,7 @@ public class EntrySamples implements IDataTransferModel {
 
     public void setPlates(ArrayList<SamplePlate> plates) {
         this.plates = plates;
-    }
+    } // TODO: 8/22/16 create another instance for array lists
 
     public ArrayList<PartSample> getPartSamples() {
         return partSamples;

@@ -15,10 +15,10 @@
         <td ng-repeat="col in Plate96Cols track by $id(col)">
             <i class="fa fa-circle-thin" style="font-size: 30px; color: darkgrey"
                ng-if="row + (10+col+'').slice(-2) !== sample.location.child.display && row + (10+col+'').slice(-2) !== plate.samplesOnPlate[Plate96Rows.indexOf(row)][Plate96Cols.indexOf(col)].location.child.display"></i>
-            <i class="fa fa-circle contains_sample"
+            <i class="fa fa-dot-circle-o contains_sample"
                style="font-size: 30px; cursor: pointer"
                ng-if="row + (10+col+'').slice(-2) !== sample.location.child.display && row + (10+col+'').slice(-2) === plate.samplesOnPlate[Plate96Rows.indexOf(row)][Plate96Cols.indexOf(col)].location.child.display"
-               uib-tooltip="Entry id: {{plate.samplesOnPlate[Plate96Rows.indexOf(row)][Plate96Cols.indexOf(col)].partId}}"
+               uib-tooltip="{{plate.samplesOnPlate[Plate96Rows.indexOf(row)][Plate96Cols.indexOf(col)].label}}"
                ng-click="moveToSampleEntry(plate.samplesOnPlate[Plate96Rows.indexOf(row)][Plate96Cols.indexOf(col)].partId)">
             </i>
             <i class="fa fa-circle"
