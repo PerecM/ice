@@ -79,10 +79,13 @@ public class SampleService {
                     break;
 
                 case PLATE96:
-                    // todo: first ask for a plate barcode, if existing, then call it
-                    currentStorage = createPlate96Location(depositor, mainLocation);
+                    List<Sample> samePlateSamples = dao.getSamplesByPlate(mainLocation.getDisplay());
+                    if (samePlateSamples == null) {
+                        currentStorage = createPlate96Location(depositor, mainLocation);
+                    } else {
+                        currentStorage = storageDAO.retrieveStorageTube(samePlateSamples.get(0).getStorage().getIndex());
+                    }
                     break;
-
                 case SHELF:
                     currentStorage = createShelfStorage(depositor, mainLocation);
                     break;
@@ -120,8 +123,6 @@ public class SampleService {
      * @return sample storage with a complete hierachy or null
      */
     protected Storage createPlate96Location(String sampleDepositor, StorageLocation mainLocation) {
-        // TODO: 7/8/16 check if new plate is needed or there is an existing one
-
         // validate: expected format is [PLATE96, WELL, (optional - TUBE)]
         StorageLocation well = mainLocation.getChild();
         StorageLocation tube;

@@ -122,6 +122,17 @@ angular.module('ice.entry.sample.controller', [])
             location: {}
         };
 
+        // check if the sample is going to be added to an existing plate
+        $scope.checkPlate = function () {
+            Util.get('rest/parts/' + partId + '/samples', function (result) {
+                if (result) {
+                    
+                } else {
+
+                }
+            });
+        };
+
         $scope.format = "M/d/yyyy h:mm a";
         $scope.newSampleTemplate = "scripts/entry/sample/barcode-popover.html";
         $scope.enablePopup = function (row, col) {

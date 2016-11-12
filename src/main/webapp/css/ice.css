@@ -196,8 +196,12 @@ html, body {
     opacity: 1;
 }
 
-.contains_sample:hover {
+.current_sample {
     color: green;
+}
+
+.contains_sample:hover {
+    color: black;
 
 }
 .contains_sample {

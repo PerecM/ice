@@ -125,7 +125,13 @@ public class SampleDAO extends HibernateRepository<Sample> {
             throw new DAOException("Failed to retrieve sample by plate index: " + barcode, e);
         }
 
-        return session.createCriteria(Sample.class.getName())
-                .add(Restrictions.in("storage", tubesStorageIds)).list();
+        List<Sample> result = null;
+        try {
+            result = session.createCriteria(Sample.class.getName())
+                    .add(Restrictions.in("storage", tubesStorageIds)).list();
+        } catch (HibernateException e) {
+            Logger.warn("No samples found for plate " + barcode);
+        }
+        return result;
     }
 }
